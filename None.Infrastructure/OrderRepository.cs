@@ -24,30 +24,48 @@ namespace None.Infrastructure
         public async Task<Order> CreateOrderAsync(int cartId, int deleveryMethodId, AppUser appUser)
         {
             //var cart = await _context.Carts.FirstOrDefaultAsync(c =>c.CartId == cartId);
-            var cart = await _context.Carts.Include(c => c.CartItems).FirstOrDefaultAsync(c => c.CartId == cartId);
+            var cart =  _context.Carts.Include(c => c.CartItems).FirstOrDefault(c => c.CartId == cartId);
             var orderItems = new List<OrderItem>();
             if (cart?.CartItems?.Count > 0)
             {
                 foreach (var item in cart.CartItems)
                 {
-                    var product = await _context.Products.FindAsync(item.ProductId);
+                    var product =  _context.Products.Find(item.ProductId);
                     var orderItem = new OrderItem(product, item.Quantity, item.Product.Price);
                     orderItems.Add(orderItem);
                     product.quantity--;
-                    await _context.SaveChangesAsync();
+                     _context.SaveChanges();
                 }
 
             }
+            decimal total = 0.0m;
 
             //calc subtotal
             var subtotal = orderItems.Sum(item => item.Price * item.Quantity);
-            var deliveryMethod = await _context.DeliveryMethods.FirstOrDefaultAsync(d => d.Id == deleveryMethodId);
+            if (cart.CartItems?.Count > 0)
+              
+            {
+               
+                foreach (var item in cart.CartItems)
+                {
+                    var product =  _context.Products.Find(item.ProductId);
+                    if (product != null)
+                    {
+                        total += (item.Quantity * product.Price);
+                    }
+                  
+                }
+            }
+           
+            var deliveryMethod =  _context.DeliveryMethods.FirstOrDefault(d => d.Id == deleveryMethodId);
             //create order
-            var order = new Order(deliveryMethod, appUser, orderItems, subtotal);
+            var order = new Order(deliveryMethod, appUser, orderItems, total);
             _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
+             _context.SaveChanges();
             return order;
         }
+
+
 
         public async Task DeleteAsync(Order order)
         {

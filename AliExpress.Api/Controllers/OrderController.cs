@@ -1,11 +1,13 @@
 ﻿using AliExpress.Application.IServices;
 using AliExpress.Application.Services;
+using AliExpress.Context;
 using AliExpress.Dtos.Order;
 using AliExpress.Models;
 using AliExpress.Models.Orders;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace AliExpress.Api.Controllers
@@ -14,14 +16,16 @@ namespace AliExpress.Api.Controllers
     [ApiController]
     public class OrderController : ControllerBase
     {
+        private readonly AliExpressContext _context;
         private readonly IOrderService _orderService;
         private readonly IMapper _mapper;
         private readonly ICartService _cartService;
 
-        public OrderController(IOrderService orderService, ICartService cartService)
+        public OrderController(IOrderService orderService, ICartService cartService, AliExpressContext context)
         {
             _orderService = orderService;
             _cartService = cartService;
+            _context = context;
         }
         [HttpPost]
         public async Task<ActionResult<OrderReturnDto>> CreateOderAsync(OrderDto orderDto)
@@ -30,7 +34,24 @@ namespace AliExpress.Api.Controllers
             {
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 var mappedOrder = await _orderService.CreateOrderAsync(orderDto.CartId, orderDto.DeliveryMethodId, userId);
+
                 await _cartService.DeleteCartDtoAsync(mappedOrder.AppUser.Cart.CartId);
+                var order = await _context.Orders
+                    .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                    .ThenInclude(i => i.Images)// Include the related Product entity
+                    .Include(o => o.DeliveryMethod)
+                    .Include(o => o.AppUser)
+                    .Where(o => o.AppUserId == userId)
+                    .OrderByDescending(o => o.CreatedAt)
+                    .FirstOrDefaultAsync();
+
+                if (orderDto.subtotal != null)
+                {
+                    order.Subtotal = orderDto.subtotal.Value; // Explicitly accessing the value
+                    _context.SaveChanges();
+                }
+
 
                 return Ok(mappedOrder);
             }

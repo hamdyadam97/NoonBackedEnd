@@ -12,6 +12,7 @@ namespace AliExpress.Dtos.Order
         public int DeliveryMethodId { get; set; }
         public AppUserDto? ShippingAddress { get; set; }
         public ICollection<string> Transactions { get; set; }
+        public decimal? subtotal { get; set; }
 
     }
 }

@@ -105,21 +105,19 @@ namespace AliExpress.Api.Controllers
 
 
 
-        //[HttpGet]
-        //public async Task<IActionResult> SearchProduct(string name)
-        //{
-        //    const int pageSize = 24;
-        //    var Prds = await _productService.GetAllProducts(name, 1, pageSize);
-        //    // Calculate total pages number
-        //    int count = await _productService.countProducts();
-        //    int totalPages = count / 24;
-        //    if (count % 24 != 0)
-        //    {
-        //        totalPages++;
-        //    }
-        //    Prds.numberOfPages = totalPages;
-        //    return Ok(Prds);
-        //}
+        [HttpGet("averageDegreeRate/{targetAverageRate}")]
+        public async Task<ActionResult<IEnumerable<ProductViewDto>>> GetProductsWithTargetAverageRate(double targetAverageRate)
+        {
+            try
+            {
+                var products = await _productService.GetProductsWithAverageDegreeRateAsync(targetAverageRate);
+                return Ok(products);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
     } 
 }

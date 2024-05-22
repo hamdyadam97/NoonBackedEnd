@@ -1330,6 +1330,11 @@ namespace AliExpress.Context.Migrations
                     b.Navigation("PrdouctBrands");
                 });
 
+            modelBuilder.Entity("AliExpress.Models.Brand", b =>
+                {
+                    b.Navigation("PrdouctBrands");
+                });
+
             modelBuilder.Entity("AliExpress.Models.Cart", b =>
                 {
                     b.Navigation("CartItems");

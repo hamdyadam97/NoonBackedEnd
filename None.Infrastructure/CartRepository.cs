@@ -33,7 +33,7 @@ namespace None.Infrastructure
              .ThenInclude(ci => ci.Product)
              .FirstOrDefaultAsync(c => c.CartId == cartId);
 
-            var existingProduct = await _context.Products.FindAsync(cartItem.ProductId);
+            var existingProduct =  _context.Products.Find(cartItem.ProductId);
             if (existingProduct == null)
             {
 
@@ -47,13 +47,14 @@ namespace None.Infrastructure
             {
                 throw new ArgumentException($"Product does not exist");
             }
-
+           
+           
                 var existingCartItem = cart.CartItems.FirstOrDefault(ci => ci.ProductId == cartItem.ProductId);
                 if (existingCartItem != null)
                 {
                     if (existingCartItem.Quantity< cartItem.Quantity)
                     {
-                        existingCartItem.Quantity += cartItem.Quantity;
+                        existingCartItem.Quantity = cartItem.Quantity;
                         _context.CartItems.Update(existingCartItem);
                     }
                     else if(existingCartItem.Quantity > cartItem.Quantity)
@@ -77,7 +78,7 @@ namespace None.Infrastructure
            
            
 
-            await _context.SaveChangesAsync();
+             _context.SaveChanges();
 
         }
 

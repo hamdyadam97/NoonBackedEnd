@@ -67,6 +67,15 @@ namespace AliExpress.Application.Services
             var mappedProducts = _mapper.Map<IEnumerable<Product>, IEnumerable<ProductViewDto>>(products);
              return mappedProducts;
         }
+
+        public async Task<IEnumerable<ProductViewDto>> GetAllProductsByNameCategory(string Name, int num)
+        {
+            var products = await _categoryRepository.getProductByNameCategory(Name,num);
+            var mappedProducts = _mapper.Map<IEnumerable<Product>, IEnumerable<ProductViewDto>>(products);
+            return mappedProducts;
+
+        }
+
         public async Task<ResultView<CategoryDto>> GetOne(int Id)
         {
             
@@ -88,13 +97,7 @@ namespace AliExpress.Application.Services
 
         }
 
-        public async Task<IEnumerable<ProductViewDto>> GetAllProductsByNameCategory(string Name, int num)
-        {
-            var products = await _categoryRepository.getProductByNameCategory(Name, num);
-            var mappedProducts = _mapper.Map<IEnumerable<Product>, IEnumerable<ProductViewDto>>(products);
-            return mappedProducts;
-
-        }
+       
 
 
     }

@@ -120,11 +120,19 @@ namespace AliExpress.Application.Services
         {
             return await _productRepository.CoutProducts();
         }
-        //public async Task<List<ProductViewDto>> Search(string name)
-        //{
-        //    var products = await _productRepository.GetAllAsync(name, 1, 24);
-        //    var pdto=_mapper.Map<Product,ProductViewDto>(products.ToList());
-        //}
+        public async Task<IEnumerable<ProductViewDto>> GetProductsWithAverageDegreeRateAsync(double targetAverageRate)
+        {
+
+           
+            var product =  await _productRepository.GetProductsWithAverageDegreeRateAsync(targetAverageRate);
+            var productsDto = _mapper.Map<IEnumerable<ProductViewDto>>(product);
+            return productsDto;
+
+
+
+
+        }
+
 
     }
 }

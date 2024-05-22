@@ -2,6 +2,7 @@
 using AliExpress.Dtos.Product;
 using AliExpress.Dtos.Subcategory;
 using AliExpress.Dtos.ViewResult;
+using AliExpress.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,9 @@ namespace AliExpress.Application.Services
         Task<ResultView<CreateUpdateDeleteProductDto>> Delete(int id);
         Task<ResultView<CreateUpdateDeleteProductDto>> GetOne(int Id);
         Task<int> countProducts();
-        //Task<List<ProductViewDto>> Search(string name);
+
+
+        Task<IEnumerable<ProductViewDto>> GetProductsWithAverageDegreeRateAsync(double targetAverageRate);
+        
     }
 }
